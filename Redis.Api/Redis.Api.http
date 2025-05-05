@@ -1,0 +1,11 @@
+@redis_HostAddress = http://localhost:5250
+
+GET {{redis_HostAddress}}/weatherforecast/Berlin
+Accept: application/json
+
+###
+
+GET {{redis_HostAddress}}/invalidate/Berlin
+Accept: application/json
+
+###
