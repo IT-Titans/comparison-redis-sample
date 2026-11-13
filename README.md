@@ -107,3 +107,9 @@ Not covered by this comparison: performance, cluster and replication behavior, a
 The cache in this example runs without authentication and without TLS. Both server images turn protected mode off by default, so the compose file publishes the port on `127.0.0.1` only. Do not widen that binding, and do not use this configuration outside a development machine.
 
 To report a vulnerability, see the [security policy](https://github.com/IT-Titans/comparison-redis-sample/security/policy).
+
+## License
+
+Copyright 2025-2026 IT Titans GmbH.
+
+Licensed under the [Apache License, Version 2.0](LICENSE).
