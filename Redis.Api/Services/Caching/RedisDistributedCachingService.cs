@@ -5,7 +5,7 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace Redis.Api.Services.Caching;
 
 /// <summary>
-/// An implementation of <see cref="IDistributedCache" /> using the <see cref="ICachingService" />.
+/// An implementation of <see cref="ICachingService" /> using the <see cref="IDistributedCache" />.
 /// </summary>
 public class RedisDistributedCachingService : ICachingService
 {
