@@ -44,17 +44,16 @@ public class RedisCachingService : ICachingService
         var db = _redis.GetDatabase();
 
         _logger.LogInformation("Looking for a cached value for key '{Key}'", key);
+        string? value = await db.StringGetAsync(key).ConfigureAwait(false);
 
-        if (await db.KeyExistsAsync(key).ConfigureAwait(false) == false)
+        if (value is null)
         {
             _logger.LogInformation("No cached value found for key '{Key}'", key);
             return default(T);
         }
 
-        var value = await db.StringGetAsync(key).ConfigureAwait(false);
-
         _logger.LogInformation("Found cached value for key '{Key}'", key);
-        return JsonSerializer.Deserialize<T>(value!);
+        return JsonSerializer.Deserialize<T>(value);
     }
 
     /// <inheritdoc />
