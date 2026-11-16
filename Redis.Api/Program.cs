@@ -7,7 +7,8 @@ using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
-const string redisConfiguration = "localhost:6379";
+var redisConfiguration = builder.Configuration.GetConnectionString("Redis")
+    ?? throw new InvalidOperationException("The connection string 'Redis' is not configured.");
 
 var cacheImplementation = args.Length == 1 
     ? args[0] 

@@ -4,10 +4,10 @@ volumes:
 
 services:
   redis:
-    image: "redis:${REDIS_VERSION:?error}"
+    image: "redis:${REDIS_VERSION:-8.10.3}"
     ports:
-      # Default Redis port. Change in .env file as required.
-      - "${REDIS_PORT:?error}:6379/tcp"
+      # Published on the loopback interface only. Override the host port in a .env file, see .env.example.
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379/tcp"
     volumes:
       - redis-data:/data
     command: redis-server --save 60 1 --loglevel warning
