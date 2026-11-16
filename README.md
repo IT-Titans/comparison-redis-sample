@@ -4,7 +4,7 @@ An ASP.NET Core minimal API that caches a slowly computed result in Redis. It re
 
 **Status:** frozen example. It is complete and no longer maintained, and it receives no dependency updates.
 
-**Last verified:** 2026-11-13 with .NET SDK 10.0.404, `StackExchange.Redis` 3.4.35 and `Microsoft.Extensions.Caching.StackExchangeRedis` 10.0.15. Verified on that date: the Release build (no warnings), application start-up in both cache modes, and that `docker compose config` resolves to the image `redis:8.10.3`. Not verified on that date: requests against a running Redis server, because no container runtime was available.
+**Last verified:** 2026-11-16 with .NET SDK 10.0.404, `StackExchange.Redis` 3.4.35, `Microsoft.Extensions.Caching.StackExchangeRedis` 10.0.15 and the image `redis:8.10.3`. Verified on that date against the running container, in both cache modes: a cache miss, a cache hit, an invalidation, and the expiry of an entry after one minute. Also verified: the Release build (no warnings) and that the server writes its snapshot to the volume.
 
 ## Prerequisites
 
@@ -69,7 +69,7 @@ The cache persists its data: the compose file starts the server with `--save 60 
 
 ## Redis and Valkey compared
 
-This section is identical in both repositories. All statements were checked on 2026-11-13.
+This section is identical in both repositories. The license and compatibility statements were checked on 2026-11-13. The commands were recorded on 2026-11-16.
 
 | | comparison-redis-sample | comparison-valkey-sample |
 |---|---|---|
@@ -77,8 +77,8 @@ This section is identical in both repositories. All statements were checked on 2
 | Server start command | `redis-server --save 60 1 --loglevel warning` | `valkey-server --save 60 1 --loglevel warning` |
 | Client packages | `StackExchange.Redis` 3.4.35, `Microsoft.Extensions.Caching.StackExchangeRedis` 10.0.15 | The same packages in the same versions |
 | Connection | `localhost:6379`, configuration key `ConnectionStrings:Redis` | `localhost:6379`, configuration key `ConnectionStrings:Valkey` |
-| Commands in `direct` mode | `GET`, `SET` with an expiry, `UNLINK` or `DEL` | The same |
-| Commands in `distributed` mode | `HMGET`, `HSET` or `HMSET`, `EXPIRE` or `PEXPIRE`, `UNLINK` or `DEL` | The same |
+| Commands in `direct` mode | `GET`, `SETEX`, `UNLINK` | The same |
+| Commands in `distributed` mode | `HMGET`, `HMSET`, `EXPIRE`, `UNLINK` | The same |
 | License of the server | RSALv2, SSPLv1 or AGPLv3, at the choice of the user | BSD-3-Clause |
 
 What is identical: after replacing `Redis` with `Valkey` in identifiers, namespaces and file names, every C# file, the project file and the configuration files of the two repositories are the same. Both use the client library `StackExchange.Redis`; there is no Valkey-specific client package in either repository.
@@ -87,11 +87,11 @@ What differs: the image, the name of the server binary in the compose file, the 
 
 Notes on the table:
 
-- **Commands.** The command names are taken from the source code of `StackExchange.Redis` 3.4.35 and of `Microsoft.Extensions.Caching.StackExchangeRedis` 10.0.15, not from a trace on a running server. Where two names are given, the client chooses by server capability or by argument. The [Valkey command reference](https://valkey.io/commands/) documents each of them.
+- **Commands.** The command names were recorded with `MONITOR` on 2026-11-16 while the quick start ran against `redis:8.10.3` and against `valkey/valkey:9.1.3`. Both servers received the same commands. The [Valkey command reference](https://valkey.io/commands/) documents each of them.
 - **Compatibility.** The Valkey documentation states: "Valkey is compatible with Redis OSS 7.2 and all earlier open-source Redis versions, as Valkey 7.2.4 is a fork of Redis OSS 7.2.4." It also states: "Existing Redis client libraries can connect to Valkey without code changes." The same page says that data files written by Redis 7.4 and later are not compatible with Valkey, so persisted data cannot be moved from a current Redis to Valkey by copying the snapshot file. Source: [Migration from Redis to Valkey](https://valkey.io/topics/migration/).
 - **License of Redis.** Redis 7.2 and earlier are BSD-3-Clause. Versions 7.4 to 7.8 are under RSALv2 or SSPLv1. Version 8.0 and later are under RSALv2, SSPLv1 or AGPLv3. Sources: the [README of Redis 8.10.3](https://github.com/redis/redis/blob/8.10.3/README.md) and the [Redis license overview](https://redis.io/legal/licenses/).
 - **License of Valkey.** BSD-3-Clause, according to the [COPYING file of Valkey 9.1.3](https://github.com/valkey-io/valkey/blob/9.1.3/COPYING). The project describes itself as "forked from the open source Redis project right before the transition to their new source available licenses" ([README of Valkey 9.1.3](https://github.com/valkey-io/valkey/blob/9.1.3/README.md)).
-- **Earlier revision.** Until 2026-11-13 the Valkey example threw a `NotSupportedException` in `distributed` mode, and its README attributed this to `IDistributedCache`. The exception was raised by the example's own code. It was not an observation about Valkey.
+- **Earlier revision.** Until 2026-11-13 the Valkey example threw a `NotSupportedException` in `distributed` mode, and its README attributed this to `IDistributedCache`. The exception was raised by the example's own code. It was not an observation about Valkey: implemented like the Redis example, the mode works against `valkey/valkey:9.1.3`.
 
 Not covered by this comparison: performance, cluster and replication behavior, and features either server added after the fork.
 
